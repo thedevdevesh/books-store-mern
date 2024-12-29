@@ -2,6 +2,7 @@ import express from "express";
 import { PORT, mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
 import { Book } from "./models/bookModel.js";
+import booksRoute from "./routes/booksRoute.js";
 
 const app = express();
 
@@ -15,32 +16,7 @@ app.get("/", (request, response) => {
     .send("Welcome To Book Collection app build using MERN Stack.");
 });
 
-// Route for Save a new Book
-app.post("/save-book", async (request, response) => {
-  try {
-    if (
-      !request.body.title ||
-      !request.body.author ||
-      !request.body.publishYear
-    ) {
-      return response.status(400).send({
-        message:
-          "Please provide all the required fields of the book: title, author, publishYear",
-      });
-    }
-    const newBook = {
-      title: request.body.title,
-      author: request.body.author,
-      publishYear: request.body.publishYear,
-    };
-
-    const savedBook = await Book.create(newBook);
-    return response.status(201).send(savedBook);
-  } catch (error) {
-    console.log("Error", error.message);
-    response.status(500).send({ message: error.message });
-  }
-});
+app.use("/books", booksRoute);
 
 mongoose
   .connect(mongoDBURL)
